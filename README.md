@@ -1,4 +1,5 @@
-# 1 Case Study: Danny's Diner
+# 1. Case Study: Danny's Diner
+<img width="1080" height="1080" alt="1'_Pic" src="https://github.com/user-attachments/assets/3f19de6e-1272-4a73-9cd8-c4c13addec6c" />
 
 ## Content 
 - [Task](#business-task)
