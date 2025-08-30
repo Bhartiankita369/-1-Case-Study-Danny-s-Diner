@@ -97,3 +97,16 @@ from pop_item
 where rn = 1 
 ```
 
+product_name|customer_id|order_count|
+------------|-----------|-----------|
+ramen       |A          |          3|
+sushi       |B          |          2|
+ramen       |B          |          2|
+curry       |B          |          2|
+ramen       |C          |          3|
+
+
+
+
+
+
