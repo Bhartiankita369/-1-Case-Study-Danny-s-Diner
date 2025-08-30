@@ -107,6 +107,141 @@ ramen       |C          |          3|
 
 
 
+### 6. Which item was purchased first by the customer after they became a member?
+
+```sql
+WITH first_item AS (
+SELECT s.customer_id, s.order_date, m.join_date, s.product_id,
+DENSE_RANK () OVER (PARTITION BY s.customer_id 
+ORDER BY s.order_date) AS order_date_rank
+FROM dannys_diner.sales s
+JOIN dannys_diner.members m 
+ON s.customer_id = m.customer_id
+WHERE s.order_date >= m.join_date)
+
+SELECT o.customer_id, m2.product_name, o.order_date, o.product_id
+FROM dannys_diner.menu m2
+JOIN first_item o 
+ON o.product_id = m2.product_id
+WHERE order_date_rank = 1
+order by customer_id
+```
+
+customer_id|product_name|order_date|product_id|
+-----------|------------|----------|----------|
+A          |curry       |2021-01-07|         2|
+B          |sushi       |2021-01-11|         1|
+
+
+### 7. Which menu item(s) was purchased just before the customer became a member and when?
+
+```sql
+WITH before_join AS (
+SELECT s.customer_id, s.order_date, m.join_date, s.product_id,
+DENSE_RANK () OVER(PARTITION BY s.customer_id
+ORDER BY s.order_date DESC) AS order_rank
+FROM dannys_diner.sales s
+JOIN dannys_diner.members m 
+ON s.customer_id = m.customer_id
+WHERE m.join_date > s.order_date
+)
+SELECT m2.product_name, b.order_date, b.join_date, b.order_rank, b.customer_id
+FROM dannys_diner.menu m2
+JOIN before_join b
+ON m2.product_id = b.product_id
+WHERE order_rank = 1
+ORDER BY customer_id
+```
+
+|product_name|order_date|join_date |order_rank|customer_id|
+|------------|----------|----------|----------|-----------|
+|sushi       |2021-01-01|2021-01-07|         1|A          |
+|curry       |2021-01-01|2021-01-07|         1|A          |
+|sushi       |2021-01-04|2021-01-09|         1|B          |
+
+
+### 8. What is the total items and amount spent for each member before they became a member?
+
+
+```sql
+Select s.customer_id, Count(s.product_id) as no_product, m2.join_date, sum(m.price) as price_sum,s.order_date
+from ((dannys_diner.menu m 
+join dannys_diner.sales s 
+on s.product_id = m.product_id)
+join dannys_diner.members m2 
+on s.customer_id = m2.customer_id )
+	
+where s.order_date < m2.join_date
+group by s.customer_id, s.order_date ,m2.join_date
+```
+
+customer_id|COUNT (s.product_id)|SUM (m.price)|join_date |order_date|
+-----------|--------------------|-------------|----------|----------|
+A          |                   2|           25|2021-01-07|2021-01-01|
+B          |                   3|           40|2021-01-09|2021-01-04|
+
+
+### 9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier how many points would each customer have?
+
+```sql
+With food_points as (
+	select * , 
+	case when product_id = 1 then price*20 
+	else price * 10
+	end as points
+	from dannys_diner.menu)
+
+select s.customer_id, sum(f.points)
+from food_points f 
+join dannys_diner.sales s
+on f.product_id = s.product_id 
+group by s. customer_id
+order by customer_id
+```
+
+|customer_id|SUM(f.points)|
+|-----------|-------------|
+|A          |          860|
+|B          |          940|
+|C          |          360|
+
+
+### 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, – not just sushi — how many points do customer A and B have at the end of January?
+
+
+```sql
+ WITH dates AS (
+  SELECT
+    m.*,
+    (m.join_date + INTERVAL '6 days')::date AS join_week,
+    -- Last day of Jan 2021:
+    (date '2021-02-01' - INTERVAL '1 day')::date AS last_date
+  FROM dannys_diner.members m
+)
+SELECT
+  s.customer_id,
+  SUM(
+    CASE
+      WHEN s.product_id = 1 THEN me.price * 20
+      WHEN s.order_date BETWEEN d.join_date AND d.join_week THEN me.price * 20
+      ELSE me.price * 10
+    END
+  ) AS points
+FROM dannys_diner.sales s
+JOIN dannys_diner.menu me
+  ON me.product_id = s.product_id
+JOIN dates d
+  ON d.customer_id = s.customer_id
+WHERE s.order_date <= d.last_date
+GROUP BY s.customer_id
+ORDER BY s.customer_id;
+```
+
+customer_id|last_date |order_date|join_week |points|
+-----------|----------|----------|----------|------|
+A          |2021-01-31|2021-01-01|2021-01-13|  1370|
+B          |2021-01-31|2021-01-01|2021-01-15|   820|
+
 
 
 
