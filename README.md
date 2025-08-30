@@ -14,7 +14,7 @@ Danny wants to use the data to answer a few simple questions about his customers
 
 ## Entity Relationship Diagram
 
-<img width="1049" height="535" alt="ERD" src="https://github.com/user-attachments/assets/3aff67dc-1958-4d2f-83c1-3703d5289b61" />
+<img width="400" height="400" alt="ERD" src="https://github.com/user-attachments/assets/3aff67dc-1958-4d2f-83c1-3703d5289b61" />
 
 ## Case Study Questions
 <details>
