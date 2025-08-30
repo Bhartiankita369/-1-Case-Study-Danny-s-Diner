@@ -9,7 +9,7 @@
 
 ***
 
-## Business Task
+## Task
 Danny wants to use the data to answer a few simple questions about his customers, especially about their visiting patterns, how much money they’ve spent and also which menu items are their favourite. 
 
 ## Entity Relationship Diagram
@@ -17,6 +17,8 @@ Danny wants to use the data to answer a few simple questions about his customers
 <img width="400" height="450" alt="ERD" src="https://github.com/user-attachments/assets/3aff67dc-1958-4d2f-83c1-3703d5289b61" />
 
 ## Case Study Questions
+<details>
+<summary>
 
 
 1. What is the total amount each customer spent at the restaurant?
