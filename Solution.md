@@ -20,7 +20,9 @@ ORDER BY customer_id
 
 
 ### 2. How many days has each customer visited the restaurant?
-````sql
+
+
+```sql
 Select  customer_id ,count(Distinct order_date) 
 from dannys_diner.sales 
 Group by customer_id
@@ -38,6 +40,8 @@ It is important here to use **COUNT(DISTINCT ...)** to find the number of days e
 
 ### 3.  What was the first item from the menu purchased by each customer?
 
+```sql
+
 Select customer_id , product_name
 from 
 	(Select customer_id, product_name, 
@@ -48,7 +52,7 @@ inner join dannys_diner.menu m
 on s.product_id = m.product_id)
 where rn = 1 
 group by customer_id , product_name
-
+```
 
 customer_id|product_name|
 -----------|------------|
