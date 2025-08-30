@@ -28,11 +28,11 @@ from dannys_diner.sales
 Group by customer_id
 ```
 
-customer_id|COUNT (DISTINCT order_date)|
------------|---------------------------|
-A          |                          4|
-B          |                          6|
-C          |                          2|
+|customer_id|COUNT (DISTINCT order_date)|
+|-----------|---------------------------|
+|A          |                          4|
+|B          |                          6|
+|C          |                          2|
 
 #### Comment: 
 It is important here to use **COUNT(DISTINCT ...)** to find the number of days each customer visited the restaurant. If we don't use **DISTINCT** we might end up with a larger number as customers could visit the restaurant more than once. 
@@ -54,11 +54,46 @@ where rn = 1
 group by customer_id , product_name
 ```
 
-customer_id|product_name|
------------|------------|
-A          |curry       |
-A          |sushi       |
+|customer_id|product_name|
+|-----------|------------|
+|A          |curry       |
+|A          |sushi       |
 B          |curry       |
 C          |ramen       |
 
+
+### 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
+
+```sql
+Select count(s.product_id) as most_purchased, m.product_name, m.product_id
+from dannys_diner.menu m
+inner join dannys_diner.sales s 
+on s.product_id = m.product_id
+group by m.product_id, m.product_name
+```
+
+
+|most_purchased|product_name|product_id|
+|--------------|------------|----------|
+|             8|ramen       |         3|
+|             4|curry       |         2|
+|             3|sushi       |         1|
+
+
+### 5. Which item was the most popular for each customer?
+
+```sql
+with pop_item as (
+Select m.product_name, s.customer_id, count(m.product_id)as order_count , 
+Dense_rank() over(partition by s.customer_id 
+order by count(m.product_id) desc) as rn
+from dannys_diner.sales s
+join dannys_diner.menu m
+on s.product_id = m.product_id
+group by s.customer_id, m.product_name)
+
+Select product_name, customer_id, order_count
+from pop_item
+where rn = 1 
+```
 
